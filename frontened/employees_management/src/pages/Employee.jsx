@@ -1,4 +1,3 @@
-// src/CreateEmployee.jsx
 import React, { useState } from "react";
 import Header from "../components/Header.jsx";  
 
@@ -62,26 +61,59 @@ const CreateEmployee = () => {
       return false;
     }
 
-    alert("Form validated successfully.");
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      console.log("Form Data:", formData);
-      alert("Employee created successfully.");
+      const { name, email, mobile, designation, gender, course, image } = formData;
+
+      // Create a FormData object to send the data
+      const data = new FormData();
+      data.append("name", name);
+      data.append("email", email);
+      data.append("mobile", mobile);
+      data.append("designation", designation);
+      data.append("gender", gender);
+      data.append("course", JSON.stringify(course)); // Convert array to string
+      data.append("image", image);
+
+      try {
+        const response = await fetch('http://localhost:5000/api/employees', {
+          method: 'POST',
+          body: data,
+        });
+
+        if (response.ok) {
+          alert("Employee created successfully.");
+          // Optionally, reset the form or redirect the user
+          setFormData({
+            name: "",
+            email: "",
+            mobile: "",
+            designation: "",
+            gender: "",
+            course: [],
+            image: null,
+          });
+        } else {
+          const errorData = await response.json();
+          alert(`Error: ${errorData.message}`);
+        }
+      } catch (error) {
+        console.error('Error creating employee:', error);
+        alert('An error occurred while creating the employee.');
+      }
     }
   };
 
   return (
     <div className="h-screen flex flex-col">
-    
       <Header />
 
       {/* Form Section */}
       <main className="flex flex-col items-center p-6">
-        
         <form
           className="bg-gray-100 p-6 rounded-lg shadow-md w-3/4"
           onSubmit={handleSubmit}
@@ -94,17 +126,19 @@ const CreateEmployee = () => {
               name="name"
               className="w-full p-2 border rounded"
               onChange={handleInputChange}
+              value={formData.name}
             />
           </div>
 
           {/* Email */}
           <div className="mb-4">
-            <label className="block text-gray-700 font-medium">Email</label>
+            <label className="block text-gray-700 font-medium"> Email</label>
             <input
               type="email"
               name="email"
               className="w-full p-2 border rounded"
               onChange={handleInputChange}
+              value={formData.email}
             />
           </div>
 
@@ -116,18 +150,18 @@ const CreateEmployee = () => {
               name="mobile"
               className="w-full p-2 border rounded"
               onChange={handleInputChange}
+              value={formData.mobile}
             />
           </div>
 
           {/* Designation */}
           <div className="mb-4">
-            <label className="block text-gray-700 font-medium">
-              Designation
-            </label>
+            <label className="block text-gray-700 font-medium">Designation</label>
             <select
               name="designation"
               className="w-full p-2 border rounded"
               onChange={handleInputChange}
+              value={formData.designation}
             >
               <option value="">Select</option>
               <option value="HR">HR</option>
@@ -146,6 +180,7 @@ const CreateEmployee = () => {
                   name="gender"
                   value="Male"
                   onChange={handleInputChange}
+                  checked={formData.gender === "Male"}
                 />{" "}
                 Male
               </label>
@@ -155,6 +190,7 @@ const CreateEmployee = () => {
                   name="gender"
                   value="Female"
                   onChange={handleInputChange}
+                  checked={formData.gender === "Female"}
                 />{" "}
                 Female
               </label>
@@ -171,6 +207,7 @@ const CreateEmployee = () => {
                   name="course"
                   value="MCA"
                   onChange={handleInputChange}
+                  checked={formData.course.includes("MCA")}
                 />{" "}
                 MCA
               </label>
@@ -180,6 +217,7 @@ const CreateEmployee = () => {
                   name="course"
                   value="BCA"
                   onChange={handleInputChange}
+                  checked={formData.course.includes("BCA")}
                 />{" "}
                 BCA
               </label>
@@ -189,6 +227,7 @@ const CreateEmployee = () => {
                   name="course"
                   value="BSC"
                   onChange={handleInputChange}
+                  checked={formData.course.includes("BSC")}
                 />{" "}
                 BSC
               </label>

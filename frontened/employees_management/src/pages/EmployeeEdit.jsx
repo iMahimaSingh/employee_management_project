@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "../components/Header.jsx"; 
 
-const EmployeeEdit = () => {
+const EmployeeEdit = ({ employeeId }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -16,16 +16,30 @@ const EmployeeEdit = () => {
 
   useEffect(() => {
     // Load data for edit
-    setFormData({
-      name: "hukum",
-      email: "hcgupta@cstech.in",
-      mobile: "954010044",
-      designation: "HR",
-      gender: "M",
-      course: ["MCA"],
-      file: null,
-    });
-  }, []);
+    const fetchEmployeeData = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/employees/${employeeId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch employee data');
+        }
+        const employee = await response.json();
+        setFormData({
+          name: employee.name,
+          email: employee.email,
+          mobile: employee.mobile,
+          designation: employee.designation,
+          gender: employee.gender,
+          course: employee.course,
+          file: null,
+        });
+      } catch (error) {
+        console.error(error);
+        alert('Error fetching employee data');
+      }
+    };
+
+    fetchEmployeeData();
+  }, [employeeId]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -67,10 +81,40 @@ const EmployeeEdit = () => {
     return Object.keys(tempErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
-      alert("Form submitted successfully!");
+      const { name, email, mobile, designation, gender, course, file } = formData;
+
+      // Create a FormData object to send the data
+      const data = new FormData();
+      data.append("name", name);
+      data.append("email", email);
+      data.append("mobile", mobile);
+      data.append("designation", designation);
+      data.append("gender", gender);
+      data.append("course", JSON.stringify(course)); // Convert array to string
+      if (file) {
+        data.append("image", file); // Only append if file is present
+      }
+
+      try {
+        const response = await fetch(`http://localhost:5000/api/employees/${employeeId}`, {
+          method: 'PUT',
+          body: data,
+        });
+
+        if (response.ok) {
+          alert("Employee updated successfully!");
+          // Optionally, redirect or reset the form
+        } else {
+          const errorData = await response.json();
+          alert(`Error: ${errorData.message}`);
+        }
+      } catch (error) {
+        console.error('Error updating employee:', error);
+        alert('An error occurred while updating the employee.');
+      }
     }
   };
 
@@ -80,7 +124,7 @@ const EmployeeEdit = () => {
 
       {/* Form Section */}
       <form className="max-w-xl mx-auto mt-8 space-y-4" onSubmit={handleSubmit}>
-         <div>
+        <div>
           <label className="block font-bold">Name</label>
           <input
             type="text"

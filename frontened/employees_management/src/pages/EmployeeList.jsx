@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useHistory } from "react-router-dom"; // Import useHistory for navigation
 import Header from "../components/Header.jsx"; 
 
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const history = useHistory(); // Initialize useHistory for navigation
 
-  
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/employee/list")
-      .then((response) => {
+    const fetchEmployees = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/employee/list");
         setEmployees(response.data); // Set the employee data from the API
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching employees:", error); // Handle API errors
-      });
+      }
+    };
+
+    fetchEmployees();
   }, []); // Empty dependency array to run the effect only once
 
   // Handle search input change
@@ -30,27 +33,38 @@ const EmployeeList = () => {
       employee.f_Email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Handle delete employee (optional, depending on your implementation)
-  const handleDelete = (id) => {
-    setEmployees(employees.filter((employee) => employee.f_Id !== id));
+  // Handle delete employee
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/employee/${id}`); // Send DELETE request
+      setEmployees(employees.filter((employee) => employee.f_Id !== id)); // Update state
+      alert("Employee deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+      alert("Failed to delete employee.");
+    }
+  };
+
+  // Navigate to CreateEmployee component
+  const handleCreateEmployee = () => {
+    history.push("/create-employee"); // Adjust the path based on your routing setup
   };
 
   return (
     <div className="p-4">
-      
       <Header /> 
 
-      
       <main>
-        
-       <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-4">
           <span className="font-bold">Total Count: {filteredEmployees.length}</span>
-          <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+          <button 
+            onClick={handleCreateEmployee} // Add onClick handler
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          >
             Create Employee
           </button>
         </div>
 
-        
         <div className="flex justify-end mb-4">
           <input
             type="text"
@@ -61,7 +75,6 @@ const EmployeeList = () => {
           />
         </div>
 
-        
         <table className="table-auto w-full border-collapse border border-gray-300">
           <thead className="bg-blue-100">
             <tr>
@@ -80,7 +93,7 @@ const EmployeeList = () => {
           <tbody>
             {filteredEmployees.map((employee) => (
               <tr key={employee.f_Id} className="text-center">
-                <td className="border border-gray-300 px-4 py-2">{employee.f_Id}</td>
+                <td className=" border border-gray-300 px-4 py-2">{employee.f_Id}</td>
                 <td className="border border-gray-300 px-4 py-2">
                   <img
                     src={employee.f_Image || "https://via.placeholder.com/50"}
