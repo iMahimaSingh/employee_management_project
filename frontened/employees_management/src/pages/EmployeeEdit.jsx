@@ -9,23 +9,33 @@ const EmployeeEdit = () => {
     designation: "",
     gender: "",
     course: [],
-    file: null,
+    image: null,// Change from file to image
   });
 
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
     // Load data for edit
-    setFormData({
-      name: "hukum",
-      email: "hcgupta@cstech.in",
-      mobile: "954010044",
-      designation: "HR",
-      gender: "M",
-      course: ["MCA"],
-      file: null,
-    });
-  }, []);
+    const fetchEmployeeData = async () => {
+      try {
+        const response = await fetch(`http://localhost:5001/api/employees/${match.params.id}`); // Fetch employee by ID
+        const data = await response.json();
+        setFormData({
+          name: data.name,
+          email: data.email,
+          mobile: data.mobile,
+          designation: data.designation,
+          gender: data.gender,
+          course: data.course,
+          image: data.image, // Assuming the image is a Base64 string
+        });
+      } catch (error) {
+        console.error("Error fetching employee data:", error);
+      }
+    };
+
+    fetchEmployeeData();
+  }, [match.params.id]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -58,8 +68,8 @@ const EmployeeEdit = () => {
     if (!formData.course.length)
       tempErrors.course = "At least one course must be selected.";
     if (
-      formData.file &&
-      !["image/jpeg", "image/png"].includes(formData.file.type)
+      formData.image &&
+      !["image/jpeg", "image/png"].includes(formData.image.split(",")[0].split(":")[1].split(";")[0])
     )
       tempErrors.file = "Only JPG or PNG files are allowed.";
 

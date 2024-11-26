@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const employeeRoutes = require('./routes/employeeRoute');
 const authRoutes = require('./routes/loginRoutes');
+const path=require('path');
 const dotenv=require('dotenv');
 dotenv.config();
 
@@ -12,6 +13,10 @@ const app = express();
 // Middleware
 app.use(express.json()); // To parse JSON request bodies
 app.use(cors()); // To handle CORS (Cross-Origin Resource Sharing)
+
+// Serve static files from the uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // Routes
 app.use('/api/employees', employeeRoutes); // Employee routes

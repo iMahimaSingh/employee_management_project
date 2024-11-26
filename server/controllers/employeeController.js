@@ -1,17 +1,19 @@
 const Employee = require('../models/Employee');
 
+
 // Add a new employee
 exports.createEmployee = async (req, res) => {
   try {
-    const { name, email, mobile, designation, gender, course } = req.body;
-
+    const { name, email, mobile, designation, gender, course,image } = req.body;
+   // create a employee instances
     const newEmployee = new Employee({
       name,
       email,
       mobile,
       designation,
       gender,
-      course
+      course,
+      image, // Store the Base64 string directly in the database
     });
 
     await newEmployee.save();

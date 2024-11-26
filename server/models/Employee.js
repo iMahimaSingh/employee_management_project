@@ -21,7 +21,15 @@ const employeeSchema = new mongoose.Schema({
     enum: ['Male', 'Female'],
     required: true
   },
-  course: [String],
+  course:{
+
+   type:[String],
+   required:true,
+  },
+  image: {
+    type: String,
+    required: true, // Store the Base64 string directly in the database
+  },
   
   createdAt: {
     type: Date,

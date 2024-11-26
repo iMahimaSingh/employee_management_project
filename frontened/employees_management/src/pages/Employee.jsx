@@ -9,7 +9,8 @@ const CreateEmployee = () => {
     mobile: "",
     designation: "",
     gender: "",
-    course: []
+    course: [],
+    image:null,
   });
 
   const handleInputChange = (e) => {
@@ -22,14 +23,20 @@ const CreateEmployee = () => {
           : prev.course.filter((c) => c !== value),
       }));
     } else if (type === "file") {
+      const file=e.target.files[0];
+      const reader=new FileReader();
+      reader.onloadend=()=>{
       setFormData((prev) => ({ ...prev, [name]: e.target.files[0] }));
+    };if (file){
+      reader.readAsDataURL(file);
+    }
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
   const validateForm = () => {
-    const { name, email, mobile, designation, gender, course } = formData;
+    const { name, email, mobile, designation, gender, course,image } = formData;
   
     if (
       !name ||
@@ -37,7 +44,8 @@ const CreateEmployee = () => {
       !mobile ||
       !designation ||
       !gender ||
-      course.length === 0 
+      course.length === 0 ||
+      !image
     ) {
       alert("All fields are required.");
       return false;
@@ -52,6 +60,12 @@ const CreateEmployee = () => {
     // Check if mobile number is exactly 10 digits
     if (!/^\d{10}$/.test(mobile)) {
       alert("Mobile number must be exactly 10 digits.");
+      return false;
+    }
+    // Validate image file type (only PNG and JPG)
+    const validImageTypes = ["image/png", "image/jpeg"];
+    if (image && !validImageTypes.includes(image.split(",")[0].split(":")[1].split(";")[0])) {
+      alert("Only PNG and JPG files are allowed.");
       return false;
     }
   
@@ -205,7 +219,17 @@ const CreateEmployee = () => {
               </label>
             </div>
           </div>
-
+        {/* Image Upload */}
+        <div className="mb-4">
+            <label className="block text-gray-700 font-medium">Upload Image</label>
+            <input
+              type="file"
+              name="image"
+              accept="image/png, image/jpeg"
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+            />
+          </div>
 
           {/* Submit */}
           <button

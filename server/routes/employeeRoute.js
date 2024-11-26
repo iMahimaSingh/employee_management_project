@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { createEmployee, getEmployees, updateEmployee, deleteEmployee } = require('../controllers/employeeController');
 
+// Use the upload middleware for the createEmployee route
 router.post('/create', createEmployee);
 
 router.get('/list', getEmployees);
