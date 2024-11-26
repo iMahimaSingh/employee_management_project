@@ -1,27 +1,29 @@
-// Import necessary modules
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');  // To handle CORS for React-Node communication
-const employeeRoute = require('./routes/employeeRoute'); // Check this path
-require('./server');  // Entry point for the backend server
+const cors = require('cors');
+const employeeRoutes = require('./routes/employeeRoute');
+const authRoutes = require('./routes/loginRoutes');
 
 
 const app = express();
 
 // Middleware
-app.use(express.json());  // To parse incoming JSON data
-app.use(cors());  // Allow cross-origin requests from frontend
-app.use('/api/employee', employeeRoute);
+app.use(express.json()); // To parse JSON request bodies
+app.use(cors()); // To handle CORS (Cross-Origin Resource Sharing)
 
-// MongoDB connection
-mongoose.connect('mongodb://localhost:27017/your_database')
+// Routes
+app.use('/api/employees', employeeRoutes); // Employee routes
+app.use('/api/auth', authRoutes); // Authentication routes
+
+// MongoDB Connection
+const mongoURI = process.env.MONGO_URI;
+
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
-  .catch((err) => console.error('Connection error:', err));
+  .catch((err) => console.error('MongoDB connection error:', err));
 
-
-// Define the port
-const PORT = process.env.PORT || 5000;
-
+// Server Listening
+const PORT = 5001;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });

@@ -9,8 +9,7 @@ const CreateEmployee = () => {
     mobile: "",
     designation: "",
     gender: "",
-    course: [],
-    image: null,
+    course: []
   });
 
   const handleInputChange = (e) => {
@@ -30,47 +29,59 @@ const CreateEmployee = () => {
   };
 
   const validateForm = () => {
-    const { name, email, mobile, designation, gender, course, image } = formData;
-
+    const { name, email, mobile, designation, gender, course } = formData;
+  
     if (
       !name ||
       !email ||
       !mobile ||
       !designation ||
       !gender ||
-      course.length === 0 ||
-      !image
+      course.length === 0 
     ) {
       alert("All fields are required.");
       return false;
     }
-
+  
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       alert("Invalid email address.");
       return false;
     }
-
-    if (!/^\d+$/.test(mobile)) {
-      alert("Mobile number should be numeric.");
+  
+    // Check if mobile number is exactly 10 digits
+    if (!/^\d{10}$/.test(mobile)) {
+      alert("Mobile number must be exactly 10 digits.");
       return false;
     }
-
-    const allowedFileTypes = ["image/jpeg", "image/png"];
-    if (!allowedFileTypes.includes(image.type)) {
-      alert("Only JPG/PNG files are allowed for image upload.");
-      return false;
-    }
-
+  
     alert("Form validated successfully.");
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      console.log("Form Data:", formData);
-      alert("Employee created successfully.");
+      try {
+        const response = await fetch("http://localhost:5001/api/employees/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json", // Set the content type to application/json
+          },
+          body: JSON.stringify(formData), // Send the formData as a JSON string
+        });
+  
+        if (!response.ok) {
+          throw new Error("Failed to save employee.");
+        }
+  
+        const data = await response.json();
+        console.log("Employee saved:", data);
+        alert("Employee created successfully!");
+      } catch (error) {
+        console.error("Error creating employee:", error);
+        alert("Failed to create employee. Please try again.");
+      }
     }
   };
 
@@ -195,17 +206,6 @@ const CreateEmployee = () => {
             </div>
           </div>
 
-          {/* Image Upload */}
-          <div className="mb-4">
-            <label className="block text-gray-700 font-medium">Image Upload</label>
-            <input
-              type="file"
-              name="image"
-              accept="image/jpeg, image/png"
-              className="w-full p-2 border rounded"
-              onChange={handleInputChange}
-            />
-          </div>
 
           {/* Submit */}
           <button

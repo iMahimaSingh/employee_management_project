@@ -11,11 +11,7 @@ const employeeSchema = new mongoose.Schema({
     unique: true,
     match: /.+\@.+\..+/  // Email validation regex
   },
-  mobile: {
-    type: String,
-    required: true,
-    match: /^\d{10}$/  // Mobile number validation (numeric and 10 digits)
-  },
+  mobile: { type: String, required: true, validate: /^[0-9]{10}$/ },
   designation: {
     type: String,
     required: true
@@ -26,10 +22,7 @@ const employeeSchema = new mongoose.Schema({
     required: true
   },
   course: [String],
-  image: {
-    type: String,
-    required: true
-  },
+  
   createdAt: {
     type: Date,
     default: Date.now

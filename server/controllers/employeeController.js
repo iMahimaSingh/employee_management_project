@@ -3,7 +3,7 @@ const Employee = require('../models/Employee');
 // Add a new employee
 exports.createEmployee = async (req, res) => {
   try {
-    const { name, email, mobile, designation, gender, course, image } = req.body;
+    const { name, email, mobile, designation, gender, course } = req.body;
 
     const newEmployee = new Employee({
       name,
@@ -11,13 +11,13 @@ exports.createEmployee = async (req, res) => {
       mobile,
       designation,
       gender,
-      course,
-      image
+      course
     });
 
     await newEmployee.save();
     res.status(201).json(newEmployee);
   } catch (error) {
+    console.error('Error adding employee:', error); // Log the error
     res.status(500).json({ message: 'Error adding employee', error });
   }
 };
