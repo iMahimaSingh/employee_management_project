@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const employeeRoutes = require('./routes/employeeRoute');
 const authRoutes = require('./routes/loginRoutes');
+const dotenv=require('dotenv');
+dotenv.config();
 
 
 const app = express();
