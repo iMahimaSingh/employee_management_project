@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Header from "../components/Header.jsx"; 
+import Header from "../components/Header.jsx";
 import { useNavigate } from 'react-router-dom';
 
 const EmployeeList = () => {
@@ -25,7 +25,7 @@ const EmployeeList = () => {
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
-  
+
   const filteredEmployees = employees.filter((employee) => {
     const nameMatches = employee.name && employee.name.toLowerCase().includes(searchTerm.toLowerCase());
     const emailMatches = employee.email && employee.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -45,12 +45,12 @@ const EmployeeList = () => {
 
   return (
     <div className="p-4">
-      <Header /> 
+      <Header />
 
       <main>
         <div className="flex justify-between items-center mb-4">
           <span className="font-bold">Total Count: {filteredEmployees.length}</span>
-          <button 
+          <button
             onClick={() => navigate('/employees')}
             className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
           >
@@ -89,41 +89,51 @@ const EmployeeList = () => {
                 <tr key={employee._id} className="text-center">
                   <td className="border border-gray-300 px-4 py-2">{employee._id}</td>
                   <td className="border border-gray-300 px-4 py-2">
-                    <img
-                      src={"https://via.placeholder.com/50"} // Adjust this if you have an image property
-                      alt={employee.name}
-                      className="h-8 w-8 mx-auto"
+                    {employee.image && (
+                      <img
+                        src={employee.image} // Assuming employee.image is a Base64 string or URL
+                        alt={employee.name}
+                        className="h-8 w-8 mx-auto"
                       />
-                    </td>
-                    <td className="border border-gray-300 px-4 py-2">{employee.name}</td>
-                    <td className="border border-gray-300 px-4 py-2">{employee.email}</td>
-                    <td className="border border-gray-300 px-4 py-2">{employee.mobile}</td>
-                    <td className="border border-gray-300 px-4 py-2">{employee.designation}</td>
-                    <td className="border border-gray-300 px-4 py-2">{employee.gender}</td>
-                    <td className="border border-gray-300 px-4 py-2">{employee.course.join(", ")}</td>
-                    <td className="border border-gray-300 px-4 py-2">{new Date(employee.createdAt).toLocaleDateString()}</td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      <button
-                        onClick={() => handleDelete(employee._id)}
-                        className="text-red-600 hover:underline"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="10" className="text-center border border-gray-300 px-4 py-2">
-                    No employees found.
+                    )}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">{employee.name}</td>
+                  <td className="border border-gray-300 px-4 py-2">{employee.email}</td>
+                  <td className="border border-gray-300 px-4 py-2">{employee.mobile}</td>
+
+
+                  <td className="border border-gray-300 px-4 py-2">{employee.designation}</td>
+                  <td className="border border-gray-300 px-4 py-2">{employee.gender}</td>
+                  <td className="border border-gray-300 px-4 py-2">{employee.course.join(", ")}</td>
+                  <td className="border border-gray-300 px-4 py-2">{new Date(employee.createdAt).toLocaleDateString()}</td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    <button
+                      onClick={() => handleDelete(employee._id)}
+                      className="text-red-600 hover:underline"
+                    >
+                      Delete
+                    </button>
+                    <button
+                      onClick={() => navigate(`/employee-edit/${employee._id}`)} // Navigate to the edit page with the employee ID
+                      className="text-blue-600 hover:underline ml-2"
+                    >
+                      Edit
+                    </button>
                   </td>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </main>
-      </div>
-    );
-  };
-  
-  export default EmployeeList;
+              ))
+            ) : (
+              <tr>
+                <td colSpan="10" className="text-center border border-gray-300 px-4 py-2">
+                  No employees found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </main>
+    </div>
+  );
+};
+
+export default EmployeeList;

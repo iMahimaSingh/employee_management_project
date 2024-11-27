@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Header from "../components/Header.jsx"; 
 
+import axios from "axios";
+import { useParams, useNavigate } from "react-router-dom";
 const EmployeeEdit = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -13,29 +15,28 @@ const EmployeeEdit = () => {
   });
 
   const [errors, setErrors] = useState({});
-
+  const { id } = useParams(); // Get the employee ID from the URL
+  const navigate = useNavigate(); // Initialize useNavigate
   useEffect(() => {
-    // Load data for edit
     const fetchEmployeeData = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/api/employees/${match.params.id}`); // Fetch employee by ID
-        const data = await response.json();
+        const response = await axios.get(`http://localhost:5001/api/employees/${id}`);
         setFormData({
-          name: data.name,
-          email: data.email,
-          mobile: data.mobile,
-          designation: data.designation,
-          gender: data.gender,
-          course: data.course,
-          image: data.image, // Assuming the image is a Base64 string
+          name: response.data.name,
+          email: response.data.email,
+          mobile: response.data.mobile,
+          designation: response.data.designation,
+          gender: response.data.gender,
+          course: response.data.course,
+          image: response.data.image,
         });
       } catch (error) {
         console.error("Error fetching employee data:", error);
       }
     };
-
+  
     fetchEmployeeData();
-  }, [match.params.id]);
+  }, [id]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -47,7 +48,14 @@ const EmployeeEdit = () => {
           : prev.course.filter((c) => c !== value),
       }));
     } else if (type === "file") {
-      setFormData((prev) => ({ ...prev, file: e.target.files[0] }));
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prev) => ({ ...prev, image: reader.result })); // Store the Base64 string
+      };
+      if (file) {
+        reader.readAsDataURL(file);
+      }
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -76,11 +84,17 @@ const EmployeeEdit = () => {
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
-      alert("Form submitted successfully!");
+      try {
+        await axios.put(`http://localhost:5001/api/employees/update/${id}`, formData);
+        alert("Employee updated successfully!");
+        navigate('/employee-list');
+      } catch (error) {
+        console.error("Error updating employee:", error.response ? error.response.data : error.message);
+        alert("Error updating employee. Please try again.");
+      }
     }
   };
 

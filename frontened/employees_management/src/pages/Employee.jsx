@@ -23,20 +23,21 @@ const CreateEmployee = () => {
           : prev.course.filter((c) => c !== value),
       }));
     } else if (type === "file") {
-      const file=e.target.files[0];
-      const reader=new FileReader();
-      reader.onloadend=()=>{
-      setFormData((prev) => ({ ...prev, [name]: e.target.files[0] }));
-    };if (file){
-      reader.readAsDataURL(file);
-    }
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prev) => ({ ...prev, [name]: reader.result })); // Use reader.result to get Base64 string
+      };
+      if (file) {
+        reader.readAsDataURL(file);
+      }
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
   const validateForm = () => {
-    const { name, email, mobile, designation, gender, course,image } = formData;
+    const { name, email, mobile, designation, gender, course, image } = formData;
   
     if (
       !name ||
@@ -62,10 +63,16 @@ const CreateEmployee = () => {
       alert("Mobile number must be exactly 10 digits.");
       return false;
     }
+  
     // Validate image file type (only PNG and JPG)
     const validImageTypes = ["image/png", "image/jpeg"];
-    if (image && !validImageTypes.includes(image.split(",")[0].split(":")[1].split(";")[0])) {
+    
+    // Ensure image is a string before calling split
+    if (typeof image === 'string' && !validImageTypes.includes(image.split(",")[0].split(":")[1].split(";")[0])) {
       alert("Only PNG and JPG files are allowed.");
+      return false;
+    } else if (typeof image !== 'string') {
+      alert("Image is not valid.");
       return false;
     }
   
